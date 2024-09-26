@@ -1,0 +1,47 @@
+{
+    "family": "wordpress-admin-db",
+    "containerDefinitions": [
+        {
+            "name": "phpmyadmin",
+            "image": "phpmyadmin",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "PMA_PORT",
+                    "value": "3306"
+                },
+                {
+                    "name": "PMA_HOST",
+                    "value": "database-1.cdgjwz3kpgym.eu-west-1.rds.amazonaws.com"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "wordpress-phpmyadmin",
+                    "awslogs-create-group": "true",
+                    "awslogs-region": "eu-west-1",
+                    "awslogs-stream-prefix": "wordpress-phpmyadmin"
+                }
+            },
+            "systemControls": []
+        }
+    ],
+    "executionRoleArn": "arn:aws:iam::925037323203:role/wordpress-prod-role",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "3072"
+}
