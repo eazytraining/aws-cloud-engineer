@@ -1,0 +1,15 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "0",
+      "Effect": "Allow",
+      "Action": ["glue:CreateTable", "glue:GetTable"],
+      "Resource": [
+        "arn:aws:glue:eu-west-1:[ACCOUNT_ID]:database/streaming",
+        "arn:aws:glue:eu-west-1:[ACCOUNT_ID]:table/streaming/*",
+        "arn:aws:glue:eu-west-1:[ACCOUNT_ID]:catalog"
+      ]
+    }
+  ]
+}

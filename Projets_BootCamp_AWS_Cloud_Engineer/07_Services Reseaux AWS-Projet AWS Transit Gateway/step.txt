@@ -1,0 +1,45 @@
+create template image
+configure template
+setup cloudwatch
+create IAM rule 
+visualise cloudwatch 
+
+create 2 vpc 
+create 2 igw
+create subnet 
+ - 1 subnet for bastion
+ - 2 pub webapp
+ - 2 priv webapp 
+
+create nat gate for pub subnet 02 
+
+creation de 3 table de routage 
+realiser les associations qui vont bien 
+
+creation de la tgw
+creation des liaisons 
+
+modifier les tables de route pour faire la liaisons entre les differents sous reseaux 
+
+
+creation de vpc flowlogs
+- creation de la regles IAM
+- creation des groupes
+
+
+creation du bastion
+- creation du sg de la bastion
+- creation de la bastion
+
+
+creation du bucket s3
+
+creation du sg des webserver
+creation des templates 
+
+creation du target group
+creation du alb
+creation du ASG
+
+create a waf 
+associate the ip address
