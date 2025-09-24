@@ -1,0 +1,43 @@
+Création des rôles IAM
+
+1 Rôle pour CodePipeline ou laisser Amazon creer lors de la creation du pipeline.
+Naviguez vers IAM : Services → IAM
+Cliquez sur "Roles" → "Create role"
+Type d'entité de confiance : Service AWS
+Cas d'utilisation : CodePipeline
+Nom du rôle : CodePipelineServiceRole
+Politiques automatiquement attachées : AWSCodePipelineServiceRole
+Créer le rôle
+
+2 Rôle pour CodeBuild
+Créer un nouveau rôle
+Type d'entité : Service AWS
+Service : CodeBuild
+Nom du rôle : CodeBuildServiceRole
+Politiques à attacher :
+     - AWSCodeBuildAdminAccess
+     - CloudWatchLogsFullAccess
+     - AmazonS3FullAccess
+
+3 Rôle pour CodeDeploy
+Créer un nouveau rôle
+Type d'entité : Service AWS
+Service : CodeDeploy
+Nom du rôle : CodeDeployServiceRole
+Politique à attacher : AWSCodeDeployRole
+
+4 Rôle pour l'instance EC2
+Créer un nouveau rôle
+Type d'entité : Service AWS
+Service : EC2
+Nom du rôle : EC2InstanceRoleForCodeDeploy
+    - AmazonEC2RoleforAWSCodeDeploy
+    - CloudWatchAgentServerPolicy
+    - AmazonSSMManagedInstanceCore
+
+5 Attacher le rôle à l'instance EC2
+Retournez à EC2 → Instances
+Sélectionnez votre instance
+Actions → Security → Modify IAM role
+Sélectionnez : EC2InstanceRoleForCodeDeploy
+Update IAM role
