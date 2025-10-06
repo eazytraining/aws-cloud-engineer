@@ -1,0 +1,137 @@
+Projet 1 : Infrastructure WordPress 3-Tiers Haute Disponibilité
+Domaine : Architecture & Compute (EC2, ELB, Auto Scaling, RDS, EFS)
+Objectif
+Déployer une application WordPress hautement disponible avec architecture 3-tiers, stockage partagé EFS, et infrastructure automatisée.
+
+Exigences Techniques
+Tier 1 : Présentation (Web Servers)
+
+Serveurs web : EC2 avec Apache/Nginx + PHP dans 2 Availability Zones minimum
+Auto Scaling Group : Min: 2, Desired: 2, Max: 6 instances
+Load Balancer : Application Load Balancer (ALB) avec health checks HTTP sur /health.php
+Stockage partagé : EFS pour /var/www/html (partage du code WordPress et uploads)
+
+Tier 2 : Application Logic
+
+WordPress : Dernière version stable installée sur toutes les instances
+Configuration : wp-config.php avec connexion RDS via variables d'environnement ou Secrets Manager
+Session management : Sessions PHP stockées dans ElastiCache Redis (optionnel mais recommandé)
+
+Tier 3 : Base de Données
+
+RDS MySQL/MariaDB : Multi-AZ activé pour haute disponibilité
+Backup : Automated backups avec retention 7 jours minimum
+Sécurité : Dans subnet privé, accessible uniquement depuis les web servers
+
+Infrastructure & Sécurité
+
+VPC : Subnets publics (web servers) et privés (RDS)
+Security Groups :
+
+ALB : HTTP/HTTPS depuis Internet (0.0.0.0/0)
+EC2 : Port 80/443 depuis ALB uniquement
+RDS : Port 3306 depuis EC2 uniquement
+EFS : Port 2049 depuis EC2 uniquement
+
+Accès SSH : Via AWS Systems Manager Session Manager (pas de clé SSH exposée)
+Monitoring : CloudWatch alarms sur CPU > 75%, unhealthy targets ALB
+
+Automatisation (Facultatif)
+
+Infrastructure as Code : Utiliser CloudFormation, AWS CDK, ou Terraform
+Tous les composants doivent être déployés via IaC ou  console manuelle
+Si Iac, les Templates/scripts doivent être paramétrables (taille instance, capacité auto-scaling, etc.)
+
+🛠️ Conduite à Suivre
+Étape 1 : Planification et Design (45 min)
+
+Dessiner l'architecture 3-tiers avec draw.io, Lucidchart ou CloudCraft
+Identifier les ressources AWS nécessaires
+Définir la structure du projet IaC (dossiers, fichiers)
+
+Étape 2 : Préparation du Code IaC (1h)
+Option A - CloudFormation :
+yaml# Structure recommandée :
+# - main.yaml (stack principale)
+# - network.yaml (VPC, subnets, IGW, NAT)
+# - storage.yaml (RDS, EFS)
+# - compute.yaml (Launch Template, ASG, ALB)
+Option B - Terraform :
+hcl# Structure recommandée :
+# - main.tf
+# - variables.tf
+# - vpc.tf
+# - rds.tf
+# - efs.tf
+# - ec2.tf (ASG + ALB)
+# - outputs.tf
+Option C - AWS CDK (Python/TypeScript) :
+python# Structure recommandée :
+# - app.py
+# - stacks/
+#   - network_stack.py
+#   - storage_stack.py
+#   - compute_stack.py
+Étape 3 : Déploiement Infrastructure Réseau (45 min)
+
+VPC avec CIDR /16
+4 subnets minimum : 2 publics (web) + 2 privés (RDS) dans 2 AZ
+Internet Gateway + NAT Gateway (ou NAT instances)
+Route Tables correctement configurées
+
+Étape 4 : Déploiement Stockage (1h)
+
+RDS MySQL/MariaDB :
+
+Multi-AZ activé
+Instance type : db.t3.micro minimum
+Backup automatique activé
+Security Group restreint
+
+
+EFS :
+
+Mount targets dans chaque AZ
+Performance mode : General Purpose
+Throughput mode : Bursting
+Lifecycle policy (optionnel)
+
+
+
+Étape 5 : Configuration des Web Servers (1h30)
+
+User Data script pour installation automatique :
+
+Apache/Nginx + PHP 8.x
+Montage EFS sur /var/www/html
+Installation WordPress
+Configuration wp-config.php avec paramètres RDS
+
+
+Launch Template avec user data
+Auto Scaling Group avec scaling policies (CPU-based)
+Application Load Balancer avec target group et health checks
+
+Étape 6 : Tests et Validation (45 min)
+
+Accéder au WordPress via l'URL ALB
+Compléter l'installation WordPress
+Tester scalabilité : générer charge CPU > 75%
+Vérifier auto-scaling (ajout/suppression d'instances)
+Tester haute disponibilité : arrêter une instance, vérifier continuité
+Uploader média dans WordPress, vérifier présence sur EFS
+
+Étape 7 : Documentation (30 min)
+
+README.md avec :
+
+Diagramme d'architecture
+Prérequis (AWS CLI, Terraform/CDK installé)
+Instructions de déploiement
+Variables à configurer
+URL d'accès ALB
+Commandes de nettoyage/destruction
+
+
+
+

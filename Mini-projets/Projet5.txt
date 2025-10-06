@@ -1,0 +1,21 @@
+Projet 5 : Plateforme de Monitoring et Cost Optimization
+Domaine : Observabilité & FinOps (CloudWatch, Cost Explorer, Trusted Advisor)
+Objectif
+Créer un système de monitoring centralisé avec analyse des coûts et recommandations d'optimisation.
+Exigences techniques
+
+Monitoring : Dashboards CloudWatch custom pour CPU, mémoire, disque, réseau
+Logs : Centralisation avec CloudWatch Logs Insights (requêtes avancées)
+Alarmes : Seuils critiques avec escalade (SNS → PagerDuty/Email)
+Cost Analysis : Rapports hebdomadaires Cost Explorer, budgets AWS
+Optimization : Identifier ressources sous-utilisées, recommandations Trusted Advisor
+Rapports : Lambda pour génération automatique de rapports (PDF/Excel) → S3 → Email
+
+Conduite à suivre
+
+Audit (45 min) : Inventorier ressources actuelles et métriques
+Dashboards (1h) : Créer dashboards CloudWatch multi-ressources
+Alarmes (45 min) : Configurer alarmes avec actions automatiques
+Cost Analysis (1h) : Setup budgets, analyse avec Cost Explorer API
+Automation (1h) : Lambda pour rapports automatisés
+Documentation (30 min) : Guide d'interprétation des métriques

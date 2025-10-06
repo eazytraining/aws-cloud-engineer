@@ -1,0 +1,21 @@
+Projet 4 : Solution de Backup et Disaster Recovery
+Domaine : Stockage & Résilience (S3, Glacier, Backup, RDS Snapshots)
+Objectif
+Implémenter une stratégie complète de backup et disaster recovery pour une infrastructure critique.
+Exigences techniques
+
+Backup automatisé : AWS Backup pour EC2, RDS, EFS
+Réplication : S3 Cross-Region Replication vers région secondaire
+Archivage : Lifecycle policies S3 → Glacier après 30 jours
+RTO/RPO : Documenter et tester (RTO < 4h, RPO < 1h)
+Alertes : EventBridge + SNS pour échecs de backup
+Compliance : Chiffrement at-rest et in-transit, tags de conformité
+
+Conduite à suivre
+
+Analyse (30 min) : Identifier ressources critiques, définir RTO/RPO
+AWS Backup (1h) : Créer backup plans avec retention policies
+S3 Replication (45 min) : Configurer CRR avec versioning
+Lifecycle (30 min) : Créer policies de transition vers Glacier
+Tests DR (1h) : Simuler perte de données et restauration
+Documentation (45 min) : Runbook de disaster recovery

@@ -1,0 +1,21 @@
+Projet 3 : Architecture Serverless Event-Driven
+Domaine : Serverless (Lambda, API Gateway, DynamoDB, EventBridge)
+Objectif
+Créer une API REST serverless pour un système de gestion de commandes avec traitement asynchrone.
+Exigences techniques
+
+API : API Gateway REST avec authentification (Cognito ou API Keys)
+Functions : Lambda en Python/Node.js pour CRUD operations
+Database : DynamoDB avec GSI pour requêtes complexes
+Events : EventBridge pour orchestrer workflows (commande → validation → notification)
+Storage : S3 pour stocker factures PDF avec présigned URLs
+Logs : CloudWatch Logs avec queries insights
+
+Conduite à suivre
+
+Design (45 min) : Modéliser DynamoDB, définir endpoints API
+Lambda (1h30) : Coder fonctions CRUD + validation
+API Gateway (45 min) : Configurer routes, méthodes, autorisation
+Events (45 min) : Créer règles EventBridge pour workflow
+Tests (30 min) : Tester endpoints avec Postman/curl
+Monitoring (30 min) : Configurer dashboards CloudWatch

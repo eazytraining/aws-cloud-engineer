@@ -1,0 +1,22 @@
+ Projet 2 : Pipeline CI/CD avec Infrastructure as Code
+Domaine : DevOps (CodePipeline, CodeBuild, CDK/CloudFormation/Terraform)
+Objectif
+Créer un pipeline CI/CD automatisé qui déploie une infrastructure AWS via IaC.
+
+Exigences techniques
+
+Source : GitHub avec application Node.js/Python simple
+IaC : CloudFormation ou CDK ou Terraform pour provisionner EC2/S3/RDS
+CI/CD : CodePipeline → CodeBuild → Déploiement automatique
+Tests : Intégrer tests unitaires dans CodeBuild
+Artifacts : Stocker builds dans S3 avec versioning
+Notifications : SNS pour succès/échecs du pipeline
+
+Conduite à suivre
+
+Préparation (45 min) : Créer repo Git, application simple, scripts IaC
+CodeBuild (1h) : Créer buildspec.yml avec tests et packaging
+Pipeline (1h) : Configurer CodePipeline avec stages (Source/Build/Deploy)
+Infrastructure (45 min) : Templates CloudFormation/Terraform
+Tests (30 min) : Valider déploiement automatique après commit
+Documentation (30 min) : Guide de déploiement
