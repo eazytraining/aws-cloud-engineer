@@ -1,0 +1,172 @@
+Projet : Real-Time Stock Data Pipeline on AWS
+
+Niveau : Intermédiaire
+Durée estimée : 1 à 2 jours
+Objectif pédagogique : Comprendre comment construire une architecture serverless pour l’ingestion, le traitement, le stockage et l’analyse de données en temps réel sur AWS.
+
+Architecture cible:
+
+Voici le flux que vous allez mettre en place:
+- Un script Python envoie des données de bourse simulées dans un Kinesis Data Stream.
+- Une fonction AWS Lambda traite les données et les enregistre dans Amazon S3 (stockage brut).
+- AWS Glue détecte automatiquement le schéma des données pour les rendre interrogeables.
+- Amazon Athena permet de lancer des requêtes SQL sur les données stockées dans S3.
+- Une deuxième fonction Lambda agrège et stocke les données traitées dans Amazon DynamoDB.
+- Si une tendance (hausse ou baisse importante) est détectée, une alerte est envoyée via Amazon SNS.
+
+Étapes à suivre:
+
+Étape 1 : Préparation locale
+Installez et configurez AWS CLI avec vos credentials :
+- aws configure
+- Créez un environnement Python :
+- python3 -m venv venv
+- source venv/bin/activate
+- pip install boto3
+- Créez un fichier data_producer.py :
+
+            import boto3, json, random, time
+
+            kinesis = boto3.client('kinesis')
+            stream_name = 'StockDataStream'
+
+            while True:
+                record = {
+                    "symbol": random.choice(["AAPL", "AMZN", "GOOG", "MSFT"]),
+                    "price": round(random.uniform(90, 300), 2),
+                    "timestamp": time.time()
+                }
+                kinesis.put_record(
+                    StreamName=stream_name,
+                    Data=json.dumps(record),
+                    PartitionKey=record["symbol"]
+                )
+                print(f"Sent: {record}")
+                time.sleep(2)
+
+Étape 2 : Créer un flux Kinesis
+
+- Connectez-vous à la console AWS.
+- Ouvrez Amazon Kinesis → Data Streams → Create Data Stream.
+- Donnez le nom StockDataStream.
+- Configurez 1 shard (suffisant pour le test).
+- Cliquez sur Create Data Stream.
+
+Étape 3 : Créer le bucket S3
+
+- Allez sur Amazon S3 → Create bucket.
+- Nommez-le : stock-data-pipeline-<votre-nom>.
+Créez deux dossiers :
+    raw/ pour les données brutes
+    query-results/ pour les résultats Athena
+
+Étape 4 : Créer la première Lambda (Processing)
+
+Allez sur AWS Lambda → Create Function → Author from scratch
+    - Nom : ProcessStockData
+    - Runtime : Python 3.12
+    - Donnez-lui un rôle IAM avec accès à Kinesis et S3 :
+            AmazonKinesisFullAccess
+            AmazonS3FullAccess
+    Ecrivez le code python adequats, exemple: 
+                import json
+                import boto3
+                import base64
+                import time
+
+                s3 = boto3.client('s3')
+                bucket_name = 'stock-data-pipeline-<votre-nom>'
+
+                def lambda_handler(event, context):
+                    data_list = []
+                    for record in event['Records']:
+                        payload = base64.b64decode(record['kinesis']['data'])
+                        data = json.loads(payload)
+                        data_list.append(data)
+
+                    filename = f"raw/stock_data_{int(time.time())}.json"
+                    s3.put_object(
+                        Bucket=bucket_name,
+                        Key=filename,
+                        Body=json.dumps(data_list)
+                    )
+                    print(f"Saved {len(data_list)} records to {filename}")
+
+Dans l’onglet Configuration → Triggers, ajoutez un Kinesis trigger pour le flux StockDataStream.
+
+Étape 5 : Créer Glue Crawler et Catalog
+
+Allez sur AWS Glue → Crawlers → Create Crawler
+- Source : votre bucket S3 (raw/)
+- Destination : Glue Data Catalog
+- Lancer le Crawler → Il va créer une table stock_data.
+
+Étape 6 : Requêter avec Athena
+
+Ouvrez Amazon Athena → Query editor
+Choisissez la base créée par le Crawler.
+Essayez une requête :
+        SELECT symbol, AVG(price) AS average_price
+        FROM stock_data
+        GROUP BY symbol;
+
+Étape 7 : Créer DynamoDB pour les tendances
+
+        Allez sur DynamoDB → Create Table
+        Table name : StockTrends
+        Partition key : symbol (String)
+        Sort key : timestamp (Number)
+
+Étape 8 : Créer la deuxième Lambda (Trend Detector)
+
+Créez une fonction DetectStockTrends.
+- Ajoutez les permissions :
+- AmazonDynamoDBFullAccess
+- AmazonSNSFullAccess
+Collez le code :
+        import boto3
+
+        sns = boto3.client('sns')
+        topic_arn = 'arn:aws:sns:<region>:<account-id>:StockAlertsTopic'
+
+        def lambda_handler(event, context):
+            for record in event['Records']:
+                new_image = record['dynamodb'].get('NewImage', {})
+                if new_image:
+                    symbol = new_image['symbol']['S']
+                    price = float(new_image['price']['N'])
+                    if price > 250:  # condition d'alerte
+                        message = f"Alert: {symbol} has exceeded ${price}!"
+                        sns.publish(TopicArn=topic_arn, Message=message)
+                        print(message)
+
+
+- Activez le stream DynamoDB sur la table StockTrends.
+- Liez ce flux comme déclencheur pour la Lambda.
+
+Étape 9 : Créer le Topic SNS
+
+Allez sur Amazon SNS → Topics → Create topic
+- Nom : StockAlertsTopic
+- Ajoutez une subscription email.
+- Vérifiez l’email de confirmation.
+
+Étape 10 : Tester le pipeline
+
+- Lancez le script Python (data_producer.py).
+- Surveillez les logs CloudWatch pour les deux Lambdas.
+
+Vérifiez :
+
+- Les fichiers bruts dans S3
+- Les tables Glue/Athena
+- Les données dans DynamoDB
+- La réception d’alertes via email
+
+Résultat attendu
+
+À la fin du projet, les apprenants doivent avoir :
+
+- Une architecture serverless fonctionnelle et automatisée
+- Un pipeline complet de traitement temps réel
+- Une compréhension pratique de Kinesis, Lambda, S3, Glue, Athena, DynamoDB, SNS
